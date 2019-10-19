@@ -1,5 +1,6 @@
 module AssignmentHelper
   def course_options(instructor)
+    options = []
     if session[:user].role.name == 'Teaching Assistant'
       courses = []
       ta = Ta.find(session[:user].id)
@@ -10,8 +11,10 @@ module AssignmentHelper
     # Administrator and Super-Administrator can see all courses
     elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
       courses = Course.all
+      options << ['-----------', nil]
     elsif session[:user].role.name == 'Instructor'
       courses = Course.where(instructor_id: instructor.id)
+      options << ['-----------', nil]
       # instructor can see courses his/her TAs created
       ta_ids = []
       ta_ids << Instructor.get_my_tas(session[:user].id)
@@ -21,8 +24,6 @@ module AssignmentHelper
         ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
       end
     end
-    options = []
-    options << ['-----------', nil]
     courses.each do |course|
       options << [course.name, course.id]
     end
