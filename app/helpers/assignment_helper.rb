@@ -4,15 +4,17 @@ module AssignmentHelper
     if session[:user].role.name == 'Teaching Assistant'
       courses = []
       ta = Ta.find(session[:user].id)
+      #the course corresponding to each TA will be added to the dropdowns.
       ta.ta_mappings.each {|mapping| courses << Course.find(mapping.course_id) }
-      # If a TA created some courses before, s/he can still add new assignments to these courses.
-      #courses << Course.where(instructor_id: instructor.id)
+
       courses.flatten!
     # Administrator and Super-Administrator can see all courses
     elsif session[:user].role.name == 'Administrator' or session[:user].role.name == 'Super-Administrator'
+      #Only super admin and instructor can have the right to make an assignment to nil course
       options << ['-----------', nil]
       courses = Course.all
     elsif session[:user].role.name == 'Instructor'
+      #Only super admin and instructor can have the right to make an assignment to nil course
       options << ['-----------', nil]
       courses = Course.where(instructor_id: instructor.id)
       # instructor can see courses his/her TAs created
